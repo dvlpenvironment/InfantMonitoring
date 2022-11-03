@@ -7,14 +7,16 @@ import numpy as np
 from threading import Thread
 from queue import Queue
 
+# ==========전역 변수 선언 ==========
 capture = None
 thread = None
 width = 640
 height = 480
-stat = False
 Q = Queue(maxsize=128)
 started = False
 
+# =============함수 정의=============
+# 카메라 시작 함수
 def run(src=0) :
     global capture
     global width
@@ -34,8 +36,10 @@ def run(src=0) :
             thread = Thread(target=update(), args=())
             thread.daemon = False
             thread.start()
+    
     started = True
 
+# 카메라 중지 기능
 def stop() :
     global capture
     global started
@@ -44,6 +48,7 @@ def stop() :
         capture.release()
         clear()
 
+# Thread를 통해 영상 데이터를 실시간으로 처리하는 함수
 def update() :
     global capture
     global started
@@ -56,23 +61,27 @@ def update() :
             if ret :
                 Q.put(frame)
 
+# Queue에 있는 영상 데이터를 삭제하는 함수
 def clear() :
     global Q
 
     with Q.mutex :
         Q.queue.clear()
 
+# Queue에 있는 영상 데이터를 읽는 함수
 def read() :
     global Q
 
     return Q.get()
 
+# 빈 영상 데이터(검은 화면)를 나타내는 함수
 def blank() :
     global width
     global height
     
     return np.ones(shape=[height, width, 3], dtype=np.uint8)
 
+# 영상 데이터를 바이너리 코드로 변환하는 함수
 def bytescode() :
     global capture
     global width
