@@ -51,3 +51,7 @@ def update() :
 
             if ret :
                 Q.put(frame)
+
+def clear() :
+    with Q.mutex :
+        Q.queue.clear()
