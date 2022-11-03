@@ -24,9 +24,9 @@ def setting():
 @app.route('/setting_post', methods=['POST'])
 def settingPost() :
     if request.method == 'POST' :
-        poseEstimationChecked = request.form.get('PoseEstimation')
-        frequentlyMoveChecked = request.form.get('FrequentlyMove')
-        blinkDetectionChecked = request.form.get('BlinkDetection')
+        poseEstimationChecked = str(request.form.get('PoseEstimation'))
+        frequentlyMoveChecked = str(request.form.get('FrequentlyMove'))
+        blinkDetectionChecked = str(request.form.get('BlinkDetection'))
         print(poseEstimationChecked, frequentlyMoveChecked, blinkDetectionChecked)
     return render_template('index.html')
 
