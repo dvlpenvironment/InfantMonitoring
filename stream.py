@@ -57,7 +57,7 @@ def updateVideoFrame() :
 
     while True :
         if started :
-            (ret, frame) = capture.readVideoFrame()
+            (ret, frame) = capture.read()
 
             if ret :
                 Q.put(frame)
@@ -67,7 +67,7 @@ def clearVideoFrame() :
     global Q
 
     with Q.mutex :
-        Q.queue.clearVideoFrame()
+        Q.queue.clear()
 
 # Queue에 있는 영상 데이터를 읽는 함수
 def readVideoFrame() :
