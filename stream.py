@@ -43,3 +43,11 @@ def stop() :
     if capture is not None :
         capture.release()
         clear()
+
+def update() :
+    while True :
+        if started :
+            (ret, frame) = capture.read()
+
+            if ret :
+                Q.put(frame)
