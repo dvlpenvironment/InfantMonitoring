@@ -9,6 +9,10 @@ from threading import Thread
 
 app = Flask(__name__)
 
+poseEstimationChecked = True
+frequentlyMoveChecked = True
+blinkDetectionChecked = True
+
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -23,6 +27,10 @@ def setting():
 
 @app.route('/setting_post', methods=['POST'])
 def settingPost() :
+    global poseEstimationChecked
+    global frequentlyMoveChecked
+    global blinkDetectionChecked
+
     if request.method == 'POST' :
         poseEstimationChecked = str(request.form.get('PoseEstimation'))
         frequentlyMoveChecked = str(request.form.get('FrequentlyMove'))
