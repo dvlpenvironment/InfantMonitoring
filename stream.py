@@ -33,9 +33,10 @@ def run(src=0) :
     capture.set(cv2.CAP_PROP_FRAME_HEIGHT, height)
 
     if thread is None :
-            thread = Thread(target=update(), args=())
+            thread = Thread(target=update, args=())
             thread.daemon = False
             thread.start()
+            
     
     started = True
 
