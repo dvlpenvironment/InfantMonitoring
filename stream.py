@@ -17,7 +17,7 @@ started = False
 
 # =============함수 정의=============
 # 카메라 시작 함수
-def run(src=0) :
+def runCam(src=0) :
     global capture
     global width
     global height
@@ -33,7 +33,7 @@ def run(src=0) :
     capture.set(cv2.CAP_PROP_FRAME_HEIGHT, height)
 
     if thread is None :
-            thread = Thread(target=update, args=())
+            thread = Thread(target=updateVideoFrame, args=())
             thread.daemon = False
             thread.start()
             
@@ -41,42 +41,42 @@ def run(src=0) :
     started = True
 
 # 카메라 중지 기능
-def stop() :
+def stopCam() :
     global capture
     global started
 
     if capture is not None :
         capture.release()
-        clear()
+        clearVideoFrame()
 
 # Thread를 통해 영상 데이터를 실시간으로 처리하는 함수
-def update() :
+def updateVideoFrame() :
     global capture
     global started
     global Q
 
     while True :
         if started :
-            (ret, frame) = capture.read()
+            (ret, frame) = capture.readVideoFrame()
 
             if ret :
                 Q.put(frame)
 
 # Queue에 있는 영상 데이터를 삭제하는 함수
-def clear() :
+def clearVideoFrame() :
     global Q
 
     with Q.mutex :
-        Q.queue.clear()
+        Q.queue.clearVideoFrame()
 
 # Queue에 있는 영상 데이터를 읽는 함수
-def read() :
+def readVideoFrame() :
     global Q
 
     return Q.get()
 
 # 빈 영상 데이터(검은 화면)를 나타내는 함수
-def blank() :
+def blankVideo() :
     global width
     global height
     
@@ -88,8 +88,8 @@ def bytescode() :
     global width
 
     if not capture.isOpened() :
-        frame = blank()
+        frame = blankVideo()
     else :
-        frame = imutils.resize(read(), width=int(width))
+        frame = imutils.resize(readVideoFrame(), width=int(width))
     
     return cv2.imencode('.jpg', frame)[1].tobytes()
