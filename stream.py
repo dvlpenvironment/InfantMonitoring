@@ -72,3 +72,14 @@ def blank() :
     global height
     
     return np.ones(shape=[height, width, 3], dtype=np.uint8)
+
+def bytescode() :
+    global capture
+    global width
+
+    if not capture.isOpened() :
+        frame = blank()
+    else :
+        frame = imutils.resize(read(), width=int(width))
+    
+    return cv2.imencode('.jpg', frame)[1].tobytes()
