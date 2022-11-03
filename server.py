@@ -32,9 +32,9 @@ def settingPost() :
     global blinkDetectionChecked
 
     if request.method == 'POST' :
-        poseEstimationChecked = str(request.form.get('PoseEstimation'))
-        frequentlyMoveChecked = str(request.form.get('FrequentlyMove'))
-        blinkDetectionChecked = str(request.form.get('BlinkDetection'))
+        poseEstimationChecked = str(request.form.get('PoseEstimation')) == 'on'
+        frequentlyMoveChecked = str(request.form.get('FrequentlyMove')) == 'on'
+        blinkDetectionChecked = str(request.form.get('BlinkDetection')) == 'on'
         print(poseEstimationChecked, frequentlyMoveChecked, blinkDetectionChecked)
     return render_template('index.html')
 
