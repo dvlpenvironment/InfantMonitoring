@@ -14,6 +14,7 @@ width = 640
 height = 480
 Q = Queue(maxsize=128)
 started = False
+videoFrame = None
 
 # =============함수 정의=============
 # 카메라 시작 함수
@@ -86,10 +87,12 @@ def blankVideo() :
 def bytescode() :
     global capture
     global width
+    global videoFrame
 
     if not capture.isOpened() :
         frame = blankVideo()
     else :
-        frame = imutils.resize(readVideoFrame(), width=int(width))
+        videoFrame = readVideoFrame()
+        frame = imutils.resize(videoFrame, width=int(width))
     
     return cv2.imencode('.jpg', frame)[1].tobytes()
