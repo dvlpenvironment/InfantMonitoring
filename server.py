@@ -32,3 +32,15 @@ def stream() :
         )
     except Exception as e :
         print('[Honey]', 'stream error : ', str(e))
+
+def stream_gen(src) :
+    try :
+        runCam(src)
+
+        while True :
+            frame = bytescode()
+
+            yield (b'--frame\r\n'
+                   b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+    except GeneratorExit :
+        stopCam()
