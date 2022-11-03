@@ -35,3 +35,11 @@ def run(src=0) :
             thread.daemon = False
             thread.start()
     started = True
+
+def stop() :
+    global capture
+    global started
+
+    if capture is not None :
+        capture.release()
+        clear()
