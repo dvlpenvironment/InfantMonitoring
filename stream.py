@@ -45,6 +45,10 @@ def stop() :
         clear()
 
 def update() :
+    global capture
+    global started
+    global Q
+
     while True :
         if started :
             (ret, frame) = capture.read()
@@ -53,8 +57,12 @@ def update() :
                 Q.put(frame)
 
 def clear() :
+    global Q
+
     with Q.mutex :
         Q.queue.clear()
 
 def read() :
+    global Q
+
     return Q.get()
