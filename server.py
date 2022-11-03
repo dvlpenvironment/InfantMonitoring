@@ -20,3 +20,15 @@ def stream_page():
 @app.route('/setting')
 def setting():
     return render_template('setting.html')
+
+@app.route('/stream')
+def stream() :
+    src = request.args.get('src', default=0, type=int)
+
+    try :
+        return Response(
+                            stream_with_context(stream_gen(src)),
+                            mimetype='multipart/x-mixed-replace; boundary=frame'
+        )
+    except Exception as e :
+        print('[Honey]', 'stream error : ', str(e))
