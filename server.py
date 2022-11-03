@@ -21,11 +21,14 @@ def stream_page():
 def setting():
     return render_template('setting.html')
 
-@app.route('/setting_post', method='POST')
+@app.route('/setting_post', methods=['POST'])
 def settingPost() :
     if request.method == 'POST' :
-        value = request.form['foo']
-        print(value)
+        poseEstimationChecked = request.form.get('PoseEstimation')
+        frequentlyMoveChecked = request.form.get('FrequentlyMove')
+        blinkDetectionChecked = request.form.get('BlinkDetection')
+        print(poseEstimationChecked, frequentlyMoveChecked, blinkDetectionChecked)
+    return render_template('index.html')
 
 @app.route('/stream')
 def stream() :
