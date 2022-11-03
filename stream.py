@@ -11,3 +11,27 @@ capture = None
 thread = None
 width = 640
 height = 480
+stat = False
+Q = Queue(maxsize=128)
+started = False
+
+def run(src=0) :
+    global capture
+    global width
+    global height
+    global thread
+    global started
+
+    if platform.system() == 'Windows' :        
+        capture = cv2.VideoCapture(src, cv2.CAP_DSHOW)
+    else :
+        capture = cv2.VideoCapture(src)
+    
+    capture.set(cv2.CAP_PROP_FRAME_WIDTH, width)
+    capture.set(cv2.CAP_PROP_FRAME_HEIGHT, height)
+
+    if thread is None :
+            thread = Thread(target=update(), args=())
+            thread.daemon = False
+            thread.start()
+    started = True
