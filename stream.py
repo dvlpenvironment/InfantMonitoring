@@ -55,3 +55,6 @@ def update() :
 def clear() :
     with Q.mutex :
         Q.queue.clear()
+
+def read() :
+    return Q.get()
