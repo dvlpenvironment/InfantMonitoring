@@ -66,3 +66,9 @@ def read() :
     global Q
 
     return Q.get()
+
+def blank() :
+    global width
+    global height
+    
+    return np.ones(shape=[height, width, 3], dtype=np.uint8)
