@@ -6,3 +6,8 @@ import numpy as np
 
 from threading import Thread
 from queue import Queue
+
+capture = None
+thread = None
+width = 640
+height = 480
