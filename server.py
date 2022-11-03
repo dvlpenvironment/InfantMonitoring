@@ -12,3 +12,7 @@ app = Flask(__name__)
 @app.route('/')
 def index():
     return render_template('index.html')
+
+@app.route('/stream_page')
+def stream_page():
+    return render_template('stream.html')
