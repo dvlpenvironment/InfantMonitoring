@@ -16,3 +16,7 @@ def index():
 @app.route('/stream_page')
 def stream_page():
     return render_template('stream.html')
+
+@app.route('/setting')
+def setting():
+    return render_template('setting.html')
