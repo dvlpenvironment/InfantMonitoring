@@ -21,6 +21,12 @@ def stream_page():
 def setting():
     return render_template('setting.html')
 
+@app.route('/setting_post', method='POST')
+def settingPost() :
+    if request.method == 'POST' :
+        value = request.form['foo']
+        print(value)
+
 @app.route('/stream')
 def stream() :
     src = request.args.get('src', default=0, type=int)
