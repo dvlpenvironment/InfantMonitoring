@@ -15,6 +15,8 @@ blinkDetectionChecked = True
 
 @app.route('/')
 def index():
+    if capture is not None :
+        capture.release()
     return render_template('index.html')
 
 @app.route('/stream_page')
