@@ -9,9 +9,9 @@ from threading import Thread
 
 app = Flask(__name__)
 
-poseEstimationChecked = True
-frequentlyMoveChecked = True
-blinkDetectionChecked = True
+poseEstimationChecked = False
+frequentlyMoveChecked = False
+blinkDetectionChecked = False
 
 @app.route('/')
 def index():
@@ -59,7 +59,7 @@ def stream() :
 def stream_gen(src, poseEstimationChecked, frequentlyMoveChecked, blinkDetectionChecked) :
     try :
         runCam(src)
-        
+
         if(poseEstimationChecked) :
             print('PoseEstimation Start')
         if(frequentlyMoveChecked) :
