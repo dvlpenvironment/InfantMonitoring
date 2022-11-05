@@ -21,8 +21,6 @@ MIN_SIZE_FOR_MOVEMENT = 2000
 # (in program cycles) for the program to declare that there is no movement
 MOVEMENT_DETECTED_PERSISTENCE = 100
 
-motion_frame = videoFrame
-
 # =============================================================================
 # CORE PROGRAM
 # =============================================================================
@@ -45,6 +43,7 @@ next_block_flag = False
 start_time = time.time()
 # LOOP!
 while True:
+    motion_frame = videoFrame
     # Set transient motion detected as false
     transient_movement_flag = False
     block_movement_flag = False
