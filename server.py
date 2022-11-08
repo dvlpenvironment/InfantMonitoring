@@ -4,9 +4,11 @@ from flask import Response
 from flask import stream_with_context
 
 from stream import Streamer
+from models import MotionDetect
 
 app = Flask(__name__)
 streamer = Streamer()
+motionDetector = MotionDetect.MotionDetecter()
 
 poseEstimationChecked = False
 frequentlyMoveChecked = False
@@ -60,6 +62,7 @@ def stream_gen(src) :
 
         if(frequentlyMoveChecked) :
             print('FrequentlyMove Start')
+            motionDetector.initializationChecked(frequentlyMoveChecked)
         else :
             print('FrequentlyMove Stop')
 
@@ -70,7 +73,9 @@ def stream_gen(src) :
 
         while True :
             frame = streamer.bytescode()
-
+            
+            if(frequentlyMoveChecked) :
+                motionDetector.updateVideoFrame(streamer.videoFrame)
             yield (b'--frame\r\n'
                    b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
     except GeneratorExit :
