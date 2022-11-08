@@ -32,8 +32,7 @@ class Streamer :
         self.capture.set(cv2.CAP_PROP_FRAME_HEIGHT, self.height)
 
         if self.thread is None :
-            self.thread = Thread(target=self.updateVideoFrame, args=())
-            self.thread.daemon = False
+            self.thread = Thread(target=self.updateVideoFrame, args=(), daemon=False)
             self.thread.start()
         
         self.started = True
@@ -41,6 +40,7 @@ class Streamer :
     # 카메라 중지 기능
     def stopCam(self) :
         if self.capture is not None :
+            self.videoFrame = None
             self.capture.release()
             self.clearVideoFrame()
 
@@ -77,5 +77,5 @@ class Streamer :
         return cv2.imencode('.jpg', frame)[1].tobytes()
     
     def __exit__(self) :
-        print('=====Streamer class exit')
+        print('=====Streamer class exit=====')
         self.capture.release()
