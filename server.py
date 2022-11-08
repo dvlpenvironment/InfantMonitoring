@@ -4,16 +4,13 @@ from flask import Response
 from flask import stream_with_context
 
 from stream import Streamer
-from models import MotionDetect
 
 app = Flask(__name__)
 streamer = Streamer()
-motionDetector = MotionDetect.MotionDetecter()
 
 @app.route('/')
 def index():
     # Clear Buffer
-    motionDetector.clearVideoFrame()
     
     return render_template('index.html')
 
@@ -34,9 +31,6 @@ def settingPost() :
         print('MODE : ', poseEstimationChecked, frequentlyMoveChecked, blinkDetectionChecked)
     
     # Init MotionDetect
-    motionDetector.initializationChecked(frequentlyMoveChecked)
-    motionDetector.clearVideoFrame()
-
     return render_template('index.html')
 
 @app.route('/stream')
