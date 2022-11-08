@@ -3,8 +3,7 @@ from flask import request
 from flask import Response
 from flask import stream_with_context
 
-from stream import *
-from threading import Thread
+from stream import Streamer
 
 app = Flask(__name__)
 streamer = Streamer()
