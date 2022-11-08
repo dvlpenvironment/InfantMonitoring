@@ -50,6 +50,9 @@ class MotionDetecter :
     def readVideoFrame(self) :
         return self.Q.get()
     
+    def clearVideoFrame(self) :
+        self.Q.queue.clear()
+
     def initializationChecked(self, check) :
         self.checked = check
 
