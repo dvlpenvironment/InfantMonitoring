@@ -10,12 +10,11 @@ app = Flask(__name__)
 streamer = Streamer()
 motionDetector = MotionDetect.MotionDetecter()
 
-poseEstimationChecked = False
-frequentlyMoveChecked = False
-blinkDetectionChecked = False
-
 @app.route('/')
 def index():
+    # Clear Buffer
+    motionDetector.clearVideoFrame()
+    
     return render_template('index.html')
 
 @app.route('/stream_page')
@@ -28,15 +27,16 @@ def setting():
 
 @app.route('/setting_post', methods=['POST'])
 def settingPost() :
-    global poseEstimationChecked
-    global frequentlyMoveChecked
-    global blinkDetectionChecked
-
     if request.method == 'POST' :
         poseEstimationChecked = str(request.form.get('PoseEstimation')) == 'on'
         frequentlyMoveChecked = str(request.form.get('FrequentlyMove')) == 'on'
         blinkDetectionChecked = str(request.form.get('BlinkDetection')) == 'on'
-        print(poseEstimationChecked, frequentlyMoveChecked, blinkDetectionChecked)
+        print('MODE : ', poseEstimationChecked, frequentlyMoveChecked, blinkDetectionChecked)
+    
+    # Init MotionDetect
+    motionDetector.initializationChecked(frequentlyMoveChecked)
+    motionDetector.clearVideoFrame()
+
     return render_template('index.html')
 
 @app.route('/stream')
@@ -55,27 +55,9 @@ def stream_gen(src) :
     try :
         streamer.runCam(src)
 
-        if(poseEstimationChecked) :
-            print('PoseEstimation Start')
-        else :
-            print('PoseEstimation Stop')
-
-        if(frequentlyMoveChecked) :
-            print('FrequentlyMove Start')
-            motionDetector.initializationChecked(frequentlyMoveChecked)
-        else :
-            print('FrequentlyMove Stop')
-
-        if(blinkDetectionChecked) :
-            print('BlinkDetection Start')
-        else :
-            print('BlinkDetection Stop')
-
         while True :
             frame = streamer.bytescode()
             
-            if(frequentlyMoveChecked) :
-                motionDetector.updateVideoFrame(streamer.videoFrame)
             yield (b'--frame\r\n'
                    b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
     except GeneratorExit :
