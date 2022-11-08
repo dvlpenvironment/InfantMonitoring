@@ -24,7 +24,7 @@ MIN_SIZE_FOR_MOVEMENT = 2000
 # CORE PROGRAM
 # =============================================================================
 
-class MotionDetect :
+class MotionDetecter :
     # Create capture object
     # cap = cv2.VideoCapture(5)  # Flush the stream
     # cap.release()
