@@ -3,8 +3,6 @@ import cv2
 import numpy as np
 import time
 from collections import deque
-from stream import videoFrame
-
 # =============================================================================
 # USER-SET PARAMETERS
 # =============================================================================
@@ -27,9 +25,9 @@ MOVEMENT_DETECTED_PERSISTENCE = 100
 
 
 # Create capture object
-# cap = cv2.VideoCapture(5)  # Flush the stream
-# cap.release()
-# cap = cv2.VideoCapture(0)  # Then start the webcam
+cap = cv2.VideoCapture(5)  # Flush the stream
+cap.release()
+cap = cv2.VideoCapture(0)  # Then start the webcam
 
 # Init frame variables
 first_frame = None
@@ -43,27 +41,26 @@ next_block_flag = False
 start_time = time.time()
 # LOOP!
 while True:
-    motion_frame = videoFrame
+
     # Set transient motion detected as false
     transient_movement_flag = False
     block_movement_flag = False
     frequently_moving = False
-
     if next_block_flag:
         start_time = time.time()
         next_block_flag = False
     # Read frame
-    # ret, frame = cap.read()
+    ret, frame = cap.read()
     text = "Unoccupied"
 
     # If there's an error in capturing
-    # if not ret:
-    #     print("CAPTURE ERROR")
-    #     continue
+    if not ret:
+        print("CAPTURE ERROR")
+        continue
 
     # Resize and save a greyscale version of the image
-    motion_frame = imutils.resize(motion_frame, width=750)
-    gray = cv2.cvtColor(motion_frame, cv2.COLOR_BGR2GRAY)
+    frame = imutils.resize(frame, width=750)
+    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
     # Blur it to remove camera noise (reducing false positives)
     gray = cv2.GaussianBlur(gray, (21, 21), 0)
@@ -104,7 +101,7 @@ while True:
             transient_movement_flag = True
 
             # Draw a rectangle around big enough movements
-            cv2.rectangle(motion_frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
+            cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
 
     # The moment something moves momentarily, reset the persistent
     # movement timer.
@@ -125,7 +122,7 @@ while True:
         text = "Frequently Movement Detected "
     else:
         text = "No Movement Detected"
-    cv2.putText(motion_frame, str(text), (10, 35), font, 0.75, (255, 255, 255), 2, cv2.LINE_AA)
+    cv2.putText(frame, str(text), (10, 35), font, 0.75, (255, 255, 255), 2, cv2.LINE_AA)
 
     # For if you want to show the individual video frames
     #    cv2.imshow("frame", frame)
@@ -135,14 +132,14 @@ while True:
     frame_delta = cv2.cvtColor(frame_delta, cv2.COLOR_GRAY2BGR)
 
     # Splice the two video frames together to make one long horizontal one
-    cv2.imshow("frame", np.hstack((frame_delta, motion_frame)))
+    cv2.imshow("frame", np.hstack((frame_delta, frame)))
 
     # Interrupt trigger by pressing q to quit the open CV program
     ch = cv2.waitKey(1)
     if ch & 0xFF == ord('q'):
         break
 
-# # Cleanup when closed
-# cv2.waitKey(0)
-# cv2.destroyAllWindows()
-# cap.release()
+# Cleanup when closed
+cv2.waitKey(0)
+cv2.destroyAllWindows()
+cap.release()
