@@ -39,21 +39,17 @@ def settingPost() :
 
 @app.route('/stream')
 def stream() :
-    global poseEstimationChecked
-    global frequentlyMoveChecked
-    global blinkDetectionChecked
-
     src = request.args.get('src', default=0, type=int)
 
     try :
         return Response(
-                            stream_with_context(stream_gen(src, poseEstimationChecked, frequentlyMoveChecked, blinkDetectionChecked)),
+                            stream_with_context(stream_gen(src)),
                             mimetype='multipart/x-mixed-replace; boundary=frame'
         )
     except Exception as e :
         print('[Honey]', 'stream error : ', str(e))
 
-def stream_gen(src, poseEstimationChecked, frequentlyMoveChecked, blinkDetectionChecked) :
+def stream_gen(src) :
     try :
         streamer.runCam(src)
 
