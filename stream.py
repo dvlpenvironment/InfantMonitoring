@@ -71,8 +71,8 @@ class Streamer :
         if not self.capture.isOpened() :
             frame = self.blankVideo()
         else :
-            videoFrame = self.readVideoFrame()
-            frame = imutils.resize(videoFrame, width=int(self.width))
+            self.videoFrame = self.readVideoFrame()
+            frame = imutils.resize(self.videoFrame, width=int(self.width))
         
         return cv2.imencode('.jpg', frame)[1].tobytes()
     
