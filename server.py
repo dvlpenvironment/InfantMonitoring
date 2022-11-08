@@ -7,6 +7,7 @@ from stream import *
 from threading import Thread
 
 app = Flask(__name__)
+streamer = Streamer()
 
 poseEstimationChecked = False
 frequentlyMoveChecked = False
@@ -14,8 +15,6 @@ blinkDetectionChecked = False
 
 @app.route('/')
 def index():
-    if capture is not None :
-        capture.release()
     return render_template('index.html')
 
 @app.route('/stream_page')
@@ -57,19 +56,27 @@ def stream() :
 
 def stream_gen(src, poseEstimationChecked, frequentlyMoveChecked, blinkDetectionChecked) :
     try :
-        runCam(src)
+        streamer.runCam(src)
 
         if(poseEstimationChecked) :
             print('PoseEstimation Start')
+        else :
+            print('PoseEstimation Stop')
+
         if(frequentlyMoveChecked) :
             print('FrequentlyMove Start')
+        else :
+            print('FrequentlyMove Stop')
+
         if(blinkDetectionChecked) :
             print('BlinkDetection Start')
+        else :
+            print('BlinkDetection Stop')
 
         while True :
-            frame = bytescode()
+            frame = streamer.bytescode()
 
             yield (b'--frame\r\n'
                    b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
     except GeneratorExit :
-        stopCam()
+        streamer.stopCam()
