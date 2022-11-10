@@ -3,15 +3,30 @@ from flask import request
 from flask import Response
 from flask import stream_with_context
 
-from stream import Streamer
+# from stream import Streamer
+from queue import Queue
+
+import cv2
+import imutils
+import platform
+import numpy as np
+
+from threading import Thread
 
 app = Flask(__name__)
-streamer = Streamer()
+# streamer = Streamer()
+capture = None
+updateThread = None
+readThread = None
+width = 640
+height = 480
+Q = Queue(maxsize=128)
+cameraOn = False
+videoFrame = None # <========== global video frame
 
 @app.route('/')
 def index():
-    # Clear Buffer
-    
+    print('Camera status : ', cameraOn)
     return render_template('index.html')
 
 @app.route('/stream_page')
@@ -29,30 +44,99 @@ def settingPost() :
         frequentlyMoveChecked = str(request.form.get('FrequentlyMove')) == 'on'
         blinkDetectionChecked = str(request.form.get('BlinkDetection')) == 'on'
         print('MODE : ', poseEstimationChecked, frequentlyMoveChecked, blinkDetectionChecked)
-    
-    # Init MotionDetect
+    runCam(0)
     return render_template('index.html')
 
 @app.route('/stream')
 def stream() :
-    src = request.args.get('src', default=0, type=int)
+    # src = request.args.get('src', default=0, type=int)
 
     try :
         return Response(
-                            stream_with_context(stream_gen(src)),
+                            stream_with_context(stream_gen()),
                             mimetype='multipart/x-mixed-replace; boundary=frame'
         )
     except Exception as e :
         print('[Honey]', 'stream error : ', str(e))
 
-def stream_gen(src) :
+def stream_gen() :
     try :
-        streamer.runCam(src)
-
-        while True :
-            frame = streamer.bytescode()
+        while True : # <==========
+            frame = bytescode()
             
             yield (b'--frame\r\n'
                    b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
     except GeneratorExit :
-        streamer.stopCam()
+        print('Back to the main page')
+        pass
+
+# 카메라 시작 함수
+def runCam(src=0) : # <==========
+    global capture
+    global cameraOn
+    global updateThread
+    global readThread
+
+    stopCam()
+    print('==========Camera ON==========')
+    if platform.system() == 'Windows' :        
+        capture = cv2.VideoCapture(src, cv2.CAP_DSHOW)
+    else :
+        capture = cv2.VideoCapture(src)
+    
+    capture.set(cv2.CAP_PROP_FRAME_WIDTH, width)
+    capture.set(cv2.CAP_PROP_FRAME_HEIGHT, height)
+
+    if updateThread is None :
+        updateThread = Thread(target=updateVideoFrame, args=(), daemon=False)
+        updateThread.start()
+    
+    if readThread is None :
+        readThread = Thread(target=readVideoFrame, args=(), daemon=False)
+        readThread.start()
+    cameraOn = True
+
+# 카메라 중지 함수
+def stopCam() : # <==========
+    global videoFrame
+    global cameraOn
+
+    cameraOn = False
+
+    if capture is not None :
+        print('==========Camera OFF==========')
+        videoFrame = None
+        capture.release()
+        clearVideoFrame()
+
+# 영상 데이터를 실시간으로 Queue에 update하는 Thread 내용, stop되면
+# 그냥 while문 진행
+def updateVideoFrame() :
+    while True :
+        if cameraOn :
+            (ret, frame) = capture.read()
+
+            if ret :
+                Q.put(frame)
+
+def readVideoFrame() :
+    global videoFrame
+
+    while True :
+        if cameraOn :
+            videoFrame = Q.get()
+
+# Queue에 있는 영상 데이터를 삭제하는 함수
+def clearVideoFrame() :
+    with Q.mutex :
+        Q.queue.clear()
+
+def blankVideo() :
+    return np.ones(shape=[height, width, 3], dtype=np.uint8)
+
+def bytescode() : # <==========
+    if capture is None or not capture.isOpened():
+        frame = blankVideo()
+    else :
+        frame = imutils.resize(videoFrame, width=int(width))
+    return cv2.imencode('.jpg', frame)[1].tobytes()
