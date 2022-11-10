@@ -2,8 +2,6 @@ from flask import Flask, render_template
 from flask import request
 from flask import Response
 from flask import stream_with_context
-
-# from stream import Streamer
 from queue import Queue
 
 import cv2
@@ -14,7 +12,7 @@ import numpy as np
 from threading import Thread
 
 app = Flask(__name__)
-# streamer = Streamer()
+app.secret_key = 'honey_badger'
 capture = None
 updateThread = None
 readThread = None
@@ -44,13 +42,23 @@ def settingPost() :
         frequentlyMoveChecked = str(request.form.get('FrequentlyMove')) == 'on'
         blinkDetectionChecked = str(request.form.get('BlinkDetection')) == 'on'
         print('MODE : ', poseEstimationChecked, frequentlyMoveChecked, blinkDetectionChecked)
-    runCam(0)
+    return render_template('index.html')
+
+@app.route('/camera_post', methods=['POST'])
+def camerapost() :
+    if request.method == 'POST' :
+        on = str(request.form.get('CameraOn')) == 'on'
+        off = str(request.form.get('CameraOff')) == 'off'
+    if on and not cameraOn :
+        print('==========Camera ON==========')
+        runCam(0)
+    elif off and cameraOn :
+        print('==========Camera OFF==========')
+        stopCam()
     return render_template('index.html')
 
 @app.route('/stream')
 def stream() :
-    # src = request.args.get('src', default=0, type=int)
-
     try :
         return Response(
                             stream_with_context(stream_gen()),
@@ -61,7 +69,7 @@ def stream() :
 
 def stream_gen() :
     try :
-        while True : # <==========
+        while True :
             frame = bytescode()
             
             yield (b'--frame\r\n'
@@ -71,14 +79,13 @@ def stream_gen() :
         pass
 
 # 카메라 시작 함수
-def runCam(src=0) : # <==========
+def runCam(src=0) :
     global capture
     global cameraOn
     global updateThread
     global readThread
 
     stopCam()
-    print('==========Camera ON==========')
     if platform.system() == 'Windows' :        
         capture = cv2.VideoCapture(src, cv2.CAP_DSHOW)
     else :
@@ -97,14 +104,13 @@ def runCam(src=0) : # <==========
     cameraOn = True
 
 # 카메라 중지 함수
-def stopCam() : # <==========
+def stopCam() :
     global videoFrame
     global cameraOn
 
     cameraOn = False
 
     if capture is not None :
-        print('==========Camera OFF==========')
         videoFrame = None
         capture.release()
         clearVideoFrame()
@@ -134,8 +140,8 @@ def clearVideoFrame() :
 def blankVideo() :
     return np.ones(shape=[height, width, 3], dtype=np.uint8)
 
-def bytescode() : # <==========
-    if capture is None or not capture.isOpened():
+def bytescode() :
+    if capture is None or videoFrame is None or not capture.isOpened():
         frame = blankVideo()
     else :
         frame = imutils.resize(videoFrame, width=int(width))
