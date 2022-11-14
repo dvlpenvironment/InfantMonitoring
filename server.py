@@ -11,8 +11,8 @@ import numpy as np
 
 from threading import Thread
 
+# ====================전역 변수 선언 ====================
 app = Flask(__name__)
-app.secret_key = 'honey_badger'
 capture = None
 updateThread = None
 readThread = None
@@ -22,19 +22,23 @@ Q = Queue(maxsize=128)
 cameraOn = False
 videoFrame = None # <========== global video frame
 
+# main page
 @app.route('/')
 def index():
-    print('Camera status : ', cameraOn)
+    # print('Camera status : ', cameraOn)
     return render_template('index.html')
 
+# streaming page
 @app.route('/stream_page')
 def stream_page():
     return render_template('stream.html')
 
+# setting page
 @app.route('/setting')
 def setting():
     return render_template('setting.html')
 
+# setting post function
 @app.route('/setting_post', methods=['POST'])
 def settingPost() :
     if request.method == 'POST' :
@@ -44,19 +48,21 @@ def settingPost() :
         print('MODE : ', poseEstimationChecked, frequentlyMoveChecked, blinkDetectionChecked)
     return render_template('index.html')
 
+# camera post function
 @app.route('/camera_post', methods=['POST'])
 def camerapost() :
     if request.method == 'POST' :
         on = str(request.form.get('CameraOn')) == 'on'
         off = str(request.form.get('CameraOff')) == 'off'
     if on and not cameraOn :
-        print('==========Camera ON==========')
+        print('====================Camera ON====================')
         runCam(0)
     elif off and cameraOn :
-        print('==========Camera OFF==========')
+        print('====================Camera OFF====================')
         stopCam()
     return render_template('index.html')
 
+# stream function
 @app.route('/stream')
 def stream() :
     try :
@@ -67,6 +73,7 @@ def stream() :
     except Exception as e :
         print('[Honey]', 'stream error : ', str(e))
 
+# 웹페이지에 바이트 코드를 이미지로 출력하는 함수
 def stream_gen() :
     try :
         while True :
@@ -95,10 +102,12 @@ def runCam(src=0) :
     capture.set(cv2.CAP_PROP_FRAME_HEIGHT, height)
 
     if updateThread is None :
+        print('Update Thread Start')
         updateThread = Thread(target=updateVideoFrame, args=(), daemon=False)
         updateThread.start()
     
     if readThread is None :
+        print('Read Thread Start')
         readThread = Thread(target=readVideoFrame, args=(), daemon=False)
         readThread.start()
     cameraOn = True
@@ -115,8 +124,8 @@ def stopCam() :
         capture.release()
         clearVideoFrame()
 
-# 영상 데이터를 실시간으로 Queue에 update하는 Thread 내용, stop되면
-# 그냥 while문 진행
+# 영상 데이터를 실시간으로 Queue에 update하는 Thread 내용, 전역변수 cameraOn이 False면
+# 빈 while문 진행
 def updateVideoFrame() :
     while True :
         if cameraOn :
@@ -125,6 +134,8 @@ def updateVideoFrame() :
             if ret :
                 Q.put(frame)
 
+# 영상 데이터를 실시간으로 Queue에서 read하는 Thread 내용, 전역변수 cameraOn이 False면
+# 빈 while문 진행
 def readVideoFrame() :
     global videoFrame
 
@@ -137,9 +148,11 @@ def clearVideoFrame() :
     with Q.mutex :
         Q.queue.clear()
 
+# 검은화면을 출력하는 함수
 def blankVideo() :
     return np.ones(shape=[height, width, 3], dtype=np.uint8)
 
+# 이미지 데이터를 바이트 코드로 변환하는 함수
 def bytescode() :
     if capture is None or videoFrame is None or not capture.isOpened():
         frame = blankVideo()
