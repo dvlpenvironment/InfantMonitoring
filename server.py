@@ -28,6 +28,7 @@ frequentlyMoveChecked = False
 blinkDetectionChecked = False
 
 motionFrameQueue = Queue(maxsize=128)
+blinkFrameQueue = Queue(maxsize=128)
 
 # main page
 @app.route('/')
@@ -66,10 +67,10 @@ def camerapost() :
         on = str(request.form.get('CameraOn')) == 'on'
         off = str(request.form.get('CameraOff')) == 'off'
     if on and not cameraOn :
-        print('====================Camera ON====================')
+        print('========================================Camera ON========================================')
         runCam(0)
     elif off and cameraOn :
-        print('====================Camera OFF====================')
+        print('========================================Camera OFF========================================')
         stopCam()
     return render_template('index.html')
 
@@ -144,8 +145,10 @@ def updateVideoFrame() :
 
             if ret :
                 Q.put(frame)
-                if frequentlyMoveChecked and cameraOn:
+                if frequentlyMoveChecked and cameraOn :
                     motionFrameQueue.put(frame)
+                if blinkDetectionChecked and cameraOn :
+                    blinkFrameQueue.put(frame)
 
 # 영상 데이터를 실시간으로 Queue에서 read하는 Thread 내용, 전역변수 cameraOn이 False면
 # 빈 while문 진행
