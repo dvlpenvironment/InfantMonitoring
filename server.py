@@ -2,7 +2,8 @@ from flask import Flask, render_template
 from flask import request
 from flask import Response
 from flask import stream_with_context
-from queue import Queue
+import queue
+from multiprocessing import Pipe, Queue
 
 import cv2
 import imutils
@@ -11,16 +12,22 @@ import numpy as np
 
 from threading import Thread
 
-# ====================전역 변수 선언 ====================
+# ====================전역 변수 선언====================
 app = Flask(__name__)
 capture = None
 updateThread = None
 readThread = None
 width = 640
 height = 480
-Q = Queue(maxsize=128)
+Q = queue.Queue(maxsize=128)
 cameraOn = False
 videoFrame = None # <========== global video frame
+
+poseEstimationChecked = False
+frequentlyMoveChecked = False
+blinkDetectionChecked = False
+
+motionFrameQueue = Queue(maxsize=128)
 
 # main page
 @app.route('/')
@@ -41,6 +48,10 @@ def setting():
 # setting post function
 @app.route('/setting_post', methods=['POST'])
 def settingPost() :
+    global poseEstimationChecked
+    global frequentlyMoveChecked
+    global blinkDetectionChecked
+    
     if request.method == 'POST' :
         poseEstimationChecked = str(request.form.get('PoseEstimation')) == 'on'
         frequentlyMoveChecked = str(request.form.get('FrequentlyMove')) == 'on'
@@ -133,6 +144,8 @@ def updateVideoFrame() :
 
             if ret :
                 Q.put(frame)
+                if frequentlyMoveChecked and cameraOn:
+                    motionFrameQueue.put(frame)
 
 # 영상 데이터를 실시간으로 Queue에서 read하는 Thread 내용, 전역변수 cameraOn이 False면
 # 빈 while문 진행

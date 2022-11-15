@@ -2,9 +2,12 @@ import imutils
 import cv2
 import numpy as np
 import time
-from collections import deque
 
-def motionDetect() :
+from collections import deque
+from fcm import sendMessage
+
+def motionDetect(frameQueue) :
+    print('====================Motion Detect Process====================')
     # =============================================================================
     # USER-SET PARAMETERS
     # =============================================================================
@@ -28,9 +31,10 @@ def motionDetect() :
     # Init display font and timeout counters
     font = cv2.FONT_HERSHEY_SIMPLEX
     delay_counter = 0
-    queue = deque()
+    dq = deque()
     next_block_flag = False
     start_time = time.time()
+    messageCheck = False
     # LOOP!
     while True:
         # Set transient motion detected as false
@@ -42,9 +46,8 @@ def motionDetect() :
             next_block_flag = False
         
         # Read frame
-        frame = cap.read() # <===============================================================
+        frame = frameQueue.get() # <===============================================================
         text = "Unoccupied"
-
         # Resize and save a greyscale version of the image
         frame = imutils.resize(frame, width=750)
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
@@ -93,21 +96,25 @@ def motionDetect() :
         # The moment something moves momentarily, reset the persistent
         # movement timer.
         if time.time() - start_time > 5:
-            print('\n\n\n한블락지남\n\n\n')
+            # print('\n\n\n한블락지남\n\n\n')
 
             if transient_movement_flag == True:
                 block_movement_flag = True
-            if  len(queue) == 3:
-                queue.popleft()
+            if  len(dq) == 3:
+                dq.popleft()
 
-            queue.append(block_movement_flag)
-            print('FIFO', queue)
+            dq.append(block_movement_flag)
+            print('FIFO', dq)
             next_block_flag = True
 
-        if sum(queue) == 3:
-            print("\n\n\n자주 움직임\n\n\n")
-            text = "Frequently Movement Detected "
+        if sum(dq) == 3:
+            # print("\n\n\n자주 움직임\n\n\n")
+            text = "Frequently Movement Detected"
+            if not messageCheck :
+                messageCheck = True
+                sendMessage('Frequently Moving Detected', 'Moving Moving Moving')
         else:
+            messageCheck = False
             text = "No Movement Detected"
         cv2.putText(frame, str(text), (10, 35), font, 0.75, (255, 255, 255), 2, cv2.LINE_AA)
 
@@ -119,9 +126,9 @@ def motionDetect() :
         frame_delta = cv2.cvtColor(frame_delta, cv2.COLOR_GRAY2BGR)
 
         # Splice the two video frames together to make one long horizontal one
-        cv2.imshow("frame", np.hstack((frame_delta, frame)))
+        # cv2.imshow("frame", np.hstack((frame_delta, frame)))
 
         # Interrupt trigger by pressing q to quit the open CV program
-        ch = cv2.waitKey(1)
-        if ch & 0xFF == ord('q'):
-            break
+        # ch = cv2.waitKey(1)
+        # if ch & 0xFF == ord('q'):
+        #     break

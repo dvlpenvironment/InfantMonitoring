@@ -15,8 +15,5 @@ def sendMessage(body, title):
  
     # 토큰값을 이용해 1명에게 푸시알림을 전송함
     result = push_service.single_device_data_message(registration_id=TOKEN, data_message=data_message)
- 
     # 전송 결과 출력
     print(result)
- 
-sendMessage("Title Example", "Body Example")
