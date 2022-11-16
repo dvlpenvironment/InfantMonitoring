@@ -4,6 +4,7 @@ from imutils import face_utils
 import imutils
 import dlib
 import cv2
+import time
 
 def eyeAspectRatio(eye):
 	# compute the euclidean distances between the two sets of
@@ -20,6 +21,7 @@ def eyeAspectRatio(eye):
 
 	# return the eye aspect ratio
 	return ear
+
 def blinkDetect(frameQueue) :
 	print('====================Blink Detect Process====================')
 	# # construct the argument parse and parse the arguments
@@ -59,7 +61,7 @@ def blinkDetect(frameQueue) :
 	# # vs = VideoStream(usePiCamera=True).start()
 	# fileStream = False
 	# time.sleep(1.0)
-
+	time.sleep(1.0)
 	# loop over frames from the video stream
 	while True:
 		# if this is a file video stream, then we need to check if
@@ -127,9 +129,9 @@ def blinkDetect(frameQueue) :
 				cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
 	
 		# show the frame
-		cv2.imshow("Frame", frame)
-		# key = cv2.waitKey(1) & 0xFF
+		cv2.imshow("Blink Detect", frame)
+		key = cv2.waitKey(1) & 0xFF
 	
-		# # if the `q` key was pressed, break from the loop
-		# if key == ord("q"):
-		# 	break
+		# if the `q` key was pressed, break from the loop
+		if key == ord("q"):
+			break
