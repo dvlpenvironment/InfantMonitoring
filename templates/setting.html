@@ -1,27 +1,28 @@
 <html>
   <body>
     <div style="text-align: center">
-      <h1><a href="/">Test Capstone</a></h1>
-
-      <div style="list-style: none">
-        <form action="/setting_post" method="post">
-          <p>
-            PoseEstimation
-            <input type="checkbox" name="PoseEstimation" checked />
-          </p>
-          <p>
-            FrequentlyMove
-            <input type="checkbox" name="FrequentlyMove" checked />
-          </p>
-          <p>
-            BlinkDetection
-            <input type="checkbox" name="BlinkDetection" checked />
-          </p>
-          <p>
-            <input type="submit" value="submit" />
-          </p>
-        </form>
-      </div>
+      <h1><a href="/">Baby Monitering</a></h1>
     </div>
+    <div style="list-style: none;position: absolute; left: 650px">
+      <form action="/setting_post" method="post">
+        알림 항목 선택
+        <p>
+          <input type="checkbox" name="PoseEstimation" />
+          Face cover, Blanket Remove Alert
+        </p>
+        <p>
+          <input type="checkbox" name="FrequentlyMove" />
+          Frequently Move Alert
+        </p>
+        <p>
+          <input type="checkbox" name="BlinkDetection" />
+          Awake Alert
+        </p>
+        <p>
+          <input type="submit" value="submit" />
+        </p>
+      </form>
+    </div>
+  </div>
   </body>
 </html>
