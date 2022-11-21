@@ -1,6 +1,6 @@
 from server import app, motionFrameQueue, blinkFrameQueue
-from MotionDetect import motionDetect
-from BlinkDetect import blinkDetect
+from models.MotionDetect import motionDetect
+from models.BlinkDetect import blinkDetect
 from multiprocessing import Process
 
 if __name__ == '__main__':

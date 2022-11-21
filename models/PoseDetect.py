@@ -6,6 +6,8 @@ import logging
 from tf_pose.estimator import TfPoseEstimator
 from tf_pose.networks import get_graph_path, model_wh
 
+cam = cv2.VideoCapture(0)
+
 logger = logging.getLogger('TfPoseEstimator-WebCam')
 logger.setLevel(logging.DEBUG)
 ch = logging.StreamHandler()
@@ -44,6 +46,10 @@ if w > 0 and h > 0:
     e = TfPoseEstimator(get_graph_path(args.model), target_size=(w, h), trt_bool=str2bool(args.tensorrt))
 else:
     e = TfPoseEstimator(get_graph_path(args.model), target_size=(432, 368), trt_bool=str2bool(args.tensorrt))
+
+logger.debug('cam read+')
+ret_val, image = cam.read()
+logger.info('cam image=%dx%d' % (image.shape[1], image.shape[0]))
 
 while True :
     logger.debug('image process+')
