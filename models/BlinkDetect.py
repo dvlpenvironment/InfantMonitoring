@@ -1,6 +1,8 @@
 # import the necessary packages
 from scipy.spatial import distance as dist
 from imutils import face_utils
+from fcm import sendMessage
+
 import imutils
 import dlib
 import cv2
@@ -60,7 +62,7 @@ def blinkDetect(frameQueue) :
 	# vs = VideoStream(src=0).start()
 	# # vs = VideoStream(usePiCamera=True).start()
 	# fileStream = False
-	# time.sleep(1.0)
+	messageCheck = False
 	time.sleep(1.0)
 	# loop over frames from the video stream
 	while True:
@@ -107,7 +109,7 @@ def blinkDetect(frameQueue) :
 
 			# check to see if the eye aspect ratio is below the blink
 			# threshold, and if so, increment the blink frame counter
-			if ear < EYE_AR_THRESH:
+			if ear > EYE_AR_THRESH:
 				COUNTER += 1
 
 			# otherwise, the eye aspect ratio is not below the blink
@@ -120,7 +122,15 @@ def blinkDetect(frameQueue) :
 
 				# reset the eye frame counter
 				COUNTER = 0
-
+			
+			if TOTAL >= 2 :
+				TOTAL = 0
+				if not messageCheck :
+					print('Awake!')
+					messageCheck = True
+					sendMessage('Awake Detected', 'Awake Awake Awake')
+			else :
+				messageCheck = False
 			# draw the total number of blinks on the frame along with
 			# the computed eye aspect ratio for the frame
 			cv2.putText(frame, "Blinks: {}".format(TOTAL), (10, 30),
