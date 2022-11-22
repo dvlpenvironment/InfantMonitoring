@@ -125,10 +125,11 @@ def motionDetect(frameQueue) :
         # Convert the frame_delta to color for splicing
         frame_delta = cv2.cvtColor(frame_delta, cv2.COLOR_GRAY2BGR)
 
+        # ======================================TEST SHOW======================================
         # Splice the two video frames together to make one long horizontal one
-        # cv2.imshow("frame", np.hstack((frame_delta, frame)))
+        cv2.imshow("frame", np.hstack((frame_delta, frame)))
 
         # Interrupt trigger by pressing q to quit the open CV program
-        # ch = cv2.waitKey(1)
-        # if ch & 0xFF == ord('q'):
-        #     break
+        ch = cv2.waitKey(1)
+        if ch & 0xFF == ord('q'):
+            break
