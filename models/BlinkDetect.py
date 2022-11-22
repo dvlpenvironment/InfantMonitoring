@@ -62,7 +62,7 @@ def blinkDetect(frameQueue) :
 	# vs = VideoStream(src=0).start()
 	# # vs = VideoStream(usePiCamera=True).start()
 	# fileStream = False
-	messageCheck = False
+	delayCount = 0
 	time.sleep(1.0)
 	# loop over frames from the video stream
 	while True:
@@ -123,14 +123,17 @@ def blinkDetect(frameQueue) :
 				# reset the eye frame counter
 				COUNTER = 0
 			
-			if TOTAL >= 2 :
+			if TOTAL >= 4 :
 				TOTAL = 0
-				if not messageCheck :
+				if delayCount is 0 :
 					print('Awake!')
-					messageCheck = True
 					sendMessage('Awake Detected', 'Awake Awake Awake')
-			else :
-				messageCheck = False
+					delayCount += 1
+				else :
+					delayCount += 1
+			
+			if delayCount >= 20 :
+				delayCount = 0
 			# draw the total number of blinks on the frame along with
 			# the computed eye aspect ratio for the frame
 			cv2.putText(frame, "Blinks: {}".format(TOTAL), (10, 30),
@@ -139,10 +142,10 @@ def blinkDetect(frameQueue) :
 				cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
 	
 		# ======================================TEST SHOW======================================
-		# # show the frame
-		# cv2.imshow("Blink Detect", frame)
-		# key = cv2.waitKey(1) & 0xFF
+		# show the frame
+		cv2.imshow("Blink Detect", frame)
+		key = cv2.waitKey(1) & 0xFF
 	
-		# # if the `q` key was pressed, break from the loop
-		# if key == ord("q"):
-		# 	break
+		# if the `q` key was pressed, break from the loop
+		if key == ord("q"):
+			break
