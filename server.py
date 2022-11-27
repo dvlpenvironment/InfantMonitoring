@@ -9,6 +9,8 @@ import cv2
 import imutils
 import platform
 import numpy as np
+from models.posenet import poseDetect
+from models.BlinkDetect import blinkDetect
 
 from threading import Thread
 
@@ -29,6 +31,7 @@ blinkDetectionChecked = False
 
 motionFrameQueue = Queue(maxsize=128)
 blinkFrameQueue = Queue(maxsize=128)
+poseFrameQueue = Queue(maxsize=128)
 
 # main page
 @app.route('/')
@@ -148,7 +151,9 @@ def updateVideoFrame() :
                 if frequentlyMoveChecked and cameraOn :
                     motionFrameQueue.put(frame)
                 if blinkDetectionChecked and cameraOn :
-                    blinkFrameQueue.put(frame)
+                    blinkDetect(frame)
+                if poseEstimationChecked and cameraOn :
+                    poseDetect(frame)
 
 # 영상 데이터를 실시간으로 Queue에서 read하는 Thread 내용, 전역변수 cameraOn이 False면
 # 빈 while문 진행
